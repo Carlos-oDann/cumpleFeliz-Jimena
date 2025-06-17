@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>¡Feliz Cumpleaños, Jimena!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Quicksand&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      background: linear-gradient(45deg, #000, #1a1a1a);
+      color: white;
+      font-family: 'Quicksand', sans-serif;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Great Vibes', cursive;
+      font-size: 3em;
+      color: #ffd700;
+      text-shadow: 2px 2px 5px #000;
+      opacity: 0;
+      animation: fadeIn 2s ease forwards 1s;
+      z-index: 2;
+      position: relative;
+    }
+
+    p {
+      font-size: 1.3em;
+      color: #ffb6c1;
+      text-shadow: 1px 1px 3px #000;
+      opacity: 0;
+      animation: fadeIn 2s ease forwards 2s;
+      z-index: 2;
+      position: relative;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>🎉 ¡Feliz Cumpleaños, Jimena! 🎉</h1>
+  <p>Es un poquito tarde pero...<br>
+    Agradecerte por cada momento en los cuales pude conocerte un poco más. Que hayas pasado un día fantástico. Desearte un buen descanso como también pedir a Dios que pueda acompañarte en cada etapa de tu vida🙃🎉🥳</p>
+
+  <!-- Fuegos artificiales -->
+  <canvas id="canvas"></canvas>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = window.innerWidth;
+    let h = canvas.height = window.innerHeight;
+
+    const fireworks = [], sparks = [];
+    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff'];
+
+    function Firework() {
+      this.x = Math.random() * w;
+      this.y = h;
+      this.targetY = Math.random() * h / 2;
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+      this.size = Math.random() * 2 + 1;
+      this.dy = Math.random() * 3 + 4;
+    }
+
+    Firework.prototype.update = function () {
+      this.y -= this.dy;
+      if (this.y <= this.targetY) {
+        for (let i = 0; i < 50; i++) {
+          sparks.push(new Spark(this.x, this.y, this.color));
+        }
+        this.dead = true;
+      }
+    };
+
+    function Spark(x, y, color) {
+      this.x = x;
+      this.y = y;
+      this.dx = (Math.random() - 0.5) * 5;
+      this.dy = (Math.random() - 0.5) * 5;
+      this.life = 100;
+      this.color = color;
+    }
+
+    Spark.prototype.update = function () {
+      this.x += this.dx;
+      this.y += this.dy;
+      this.life--;
+    };
+
+    function animate() {
+      ctx.fillStyle = 'rgba(0,0,0,0.2)';
+      ctx.fillRect(0, 0, w, h);
+      if (Math.random() < 0.05) fireworks.push(new Firework());
+
+      for (let i = fireworks.length - 1; i >= 0; i--) {
+        fireworks[i].update();
+        if (fireworks[i].dead) fireworks.splice(i, 1);
+        else {
+          ctx.beginPath();
+          ctx.arc(fireworks[i].x, fireworks[i].y, fireworks[i].size, 0, Math.PI * 2);
+          ctx.fillStyle = fireworks[i].color;
+          ctx.fill();
+        }
+      }
+
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        sparks[i].update();
+        if (sparks[i].life <= 0) sparks.splice(i, 1);
+        else {
+          ctx.beginPath();
+          ctx.arc(sparks[i].x, sparks[i].y, 2, 0, Math.PI * 2);
+          ctx.fillStyle = sparks[i].color;
+          ctx.fill();
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', () => {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    });
+
+    animate();
+  </script>
+</body>
+
+</html>
